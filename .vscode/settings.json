@@ -1,0 +1,9 @@
+{
+    "editor.rulers": [80, 100],
+    "files.trimTrailingWhitespace": true,
+    "spellright.language": [],
+    "spellright.documentTypes": [
+        "latex",
+        "plaintext"
+    ]
+}
