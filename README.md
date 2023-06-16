@@ -154,6 +154,27 @@ This setup serve images from other public origin servers, as well as from Amazon
 
 You can learn how to serve files from private storage in the [configurations section](#serving-files-from-private-storage).
 
+
+### Customize resizing via query string
+
+You can also parse arguments from the request's query string, such as `?width=300` for the image's width or `?height=200` for the image's height, or even both of demensions, to flexibly change some parameters for resizing.
+
+In this setup example, I used the `width` and `height` arguments to override the existing presets.
+
+> Image with specific demensions (1200x960).<br/>
+> http://localhost/@nasa/esp_040663_1415.jpg?width=1200&height=960
+
+> Image with `width` is set to 500px.<br/>
+> http://localhost/@nasa/esp_040663_1415.jpg?width=500
+
+> Image with `height` is set to 500px.<br/>
+> http://localhost/@nasa/esp_040663_1415.jpg?height=500
+
+> The image with preset `_medium` applied, but the query string will override the dimensions of the output image to 50x200px.<br/>
+> http://localhost/@nasa/_medium/esp_040663_1415.jpg?width=50&height=200
+
+See [my configurations](#advanced-settings) to know how it works.
+
 ---
 
 
@@ -261,7 +282,7 @@ Then run the command in the [Start the server](#start-the-server) section to res
 
 ### Advanced settings
 
-All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L216) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
+All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L234) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
 
 I keep all configurations in very simple variables. You can also make your own version from this base.
 
@@ -347,6 +368,7 @@ I keep all configurations in very simple variables. You can also make your own v
 
 > **`$imgproxy_preset`**<br/>
 > Define `imgproxy` options for each preset name.
+> You can view more details by following [their documentation](https://docs.imgproxy.net/generating_the_url?id=processing-options).
 > ```nginx
 > map $preset_name $imgproxy_preset
 > {
@@ -361,6 +383,26 @@ I keep all configurations in very simple variables. You can also make your own v
 >     medium  'size:640:640:0:0/preset:logo';
 >     thumb   'size:160:160:1:1/bg:ffffff/resizing_type:fill/sharpen:0.3';
 >     square  'size:500:500:0:1/bg:ffffff/resizing_type:fill/preset:center_logo';
+> }
+> ```
+
+
+> **`$imgproxy_preset_query` (overriding presets with query string)**<br/>
+> Override the `$imgproxy_preset` whenever `width` or `height` provided.
+> But beware that dynamic image sizes are able to cause a denial-of-service attack by allowing an attacker to request multiple different image resizes.
+> ```nginx
+> map "$arg_width:$arg_height" $imgproxy_preset_query
+> {
+>     default '';
+>
+>     # only width
+>     ~^(?<width>[0-9]+):$ '/size:${width}:0:1:0/bg:ffffff/resizing_type:fill';
+>
+>     # only height
+>     ~^:(?<height>[0-9]+)$ '/size:0:${height}:1:0/bg:ffffff/resizing_type:fill';
+>
+>     # both width and height
+>     ~^(?<width>[0-9]+):(?<height>[0-9]+)$ '/size:${width}:${height}:1:0/bg:ffffff/resizing_type:fill';
 > }
 > ```
 
@@ -383,7 +425,7 @@ I keep all configurations in very simple variables. You can also make your own v
 > ```nginx
 > map $arg_skip $imgproxy_options
 > {
->     default '/unsafe/${imgproxy_preset}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
+>     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
 >     ~.+     '/unsafe/plain/${origin_server}${origin_uri}';
 > }
 > ```
