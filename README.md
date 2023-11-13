@@ -16,7 +16,7 @@
 ![docker-imgproxy](www/project.jpg)
 
 - **Author**: Mai Nhut Tan <shin@shin.company>
-- **Copyright**: 2021 AppSeeds <https://code.shin.company/docker-imgproxy#readme>
+- **Copyright**: 2021-2023 SHIN Company <https://code.shin.company/docker-imgproxy#readme>
 
 
 ## Support my activities
@@ -116,36 +116,36 @@ See [my configurations](#advanced-settings) to know how it works.
 
 ### Remote images
 
-With the same presets as above examples, we are going to serve an image [by NASA](https://www.nasa.gov/sites/default/files/thumbnails/image/esp_040663_1415.jpg) using the alias `@nasa`, that will be added in these URLs.
+With the same presets as above examples, we are going to serve an image [by NASA](https://mars.nasa.gov/system/downloadable_items/40368_PIA22228.jpg) using the alias `@nasa`, that will be added in these URLs.
 
 <small>Note: the image source is from NASA, it may be unavailable in the future.</small>
 
 > Image with no preset (it is resized to max-width=1600 as default).<br/>
-> http://localhost/@nasa/esp_040663_1415.jpg
+> http://localhost/@nasa/40368_PIA22228.jpg
 
 
 > The image with preset `_w200` applied (`200` is a dynamic number).<br/>
-> http://localhost/@nasa/_w200/esp_040663_1415.jpg
+> http://localhost/@nasa/_w200/40368_PIA22228.jpg
 
 
 > The image with preset `_blurry` applied.<br/>
-> http://localhost/@nasa/_blurry/esp_040663_1415.jpg
+> http://localhost/@nasa/_blurry/40368_PIA22228.jpg
 
 
 > The image with preset `_small` applied.<br/>
-> http://localhost/@nasa/_small/esp_040663_1415.jpg
+> http://localhost/@nasa/_small/40368_PIA22228.jpg
 
 
 > The image with preset `_medium` applied.<br/>
-> http://localhost/@nasa/_medium/esp_040663_1415.jpg
+> http://localhost/@nasa/_medium/40368_PIA22228.jpg
 
 
 > The image with preset `_thumb` applied.<br/>
-> http://localhost/@nasa/_thumb/esp_040663_1415.jpg
+> http://localhost/@nasa/_thumb/40368_PIA22228.jpg
 
 
 > The image with preset `_square` applied.<br/>
-> http://localhost/@nasa/_square/esp_040663_1415.jpg
+> http://localhost/@nasa/_square/40368_PIA22228.jpg
 
 
 #### Supported origin servers
@@ -157,21 +157,54 @@ You can learn how to serve files from private storage in the [configurations sec
 
 ### Customize resizing via query string
 
+#### Image width and height
+
 You can also parse arguments from the request's query string, such as `?width=300` for the image's width or `?height=200` for the image's height, or even both of demensions, to flexibly change some parameters for resizing.
 
 In this setup example, I used the `width` and `height` arguments to override the existing presets.
 
 > Image with specific demensions (1200x960).<br/>
-> http://localhost/@nasa/esp_040663_1415.jpg?width=1200&height=960
+> http://localhost/@nasa/40368_PIA22228.jpg?width=1200&height=960
 
 > Image with `width` is set to 500px.<br/>
-> http://localhost/@nasa/esp_040663_1415.jpg?width=500
+> http://localhost/@nasa/40368_PIA22228.jpg?width=500
 
 > Image with `height` is set to 500px.<br/>
-> http://localhost/@nasa/esp_040663_1415.jpg?height=500
+> http://localhost/@nasa/40368_PIA22228.jpg?height=500
 
 > The image with preset `_medium` applied, but the query string will override the dimensions of the output image to 50x200px.<br/>
-> http://localhost/@nasa/_medium/esp_040663_1415.jpg?width=50&height=200
+> http://localhost/@nasa/_medium/40368_PIA22228.jpg?width=50&height=200
+
+#### Image quality
+
+In addition, you can override the default quality defined by `IMGPROXY_FORMAT_QUALITY` in the `docker-compose.yml` file by passing a `quality` value (ranging from 1 to 100) in the query string of the request. For example, adding `?quality=100` will set the output image quality to 100% (the best quality).
+
+> Image with `quality` is set.<br/>
+> You can check the download size of the image using browser's Developer Tools.<br/>
+> http://localhost/cacti.jpg?quality=1
+>
+> http://localhost/cacti.jpg?quality=10
+>
+> http://localhost/cacti.jpg?quality=50
+>
+> http://localhost/cacti.jpg?quality=80
+>
+> http://localhost/cacti.jpg?quality=100
+
+> Image quality with a human readable `quality` value.<br/>
+> You can check the download size of the image using browser's Developer Tools.<br/>
+> http://localhost/cacti.jpg?quality=low
+>
+> http://localhost/cacti.jpg?quality=clear
+>
+> http://localhost/cacti.jpg?quality=high
+>
+> http://localhost/cacti.jpg?quality=highest
+
+> You can combine the `quality` option with any above preset.<br/>
+> http://localhost/_medium/cacti.jpg?quality=high
+>
+> http://localhost/_blurry/cacti.jpg?width=500&height=500&quality=1
 
 See [my configurations](#advanced-settings) to know how it works.
 
@@ -197,12 +230,12 @@ X-Debug: /unsafe/size:320:320:0:0/sharpen:0.3/preset:logo/plain/local:///cacti.j
 
 Example 2 (remote file with preset `_w640`):
 ```
-curl -Isk 'http://localhost/@nasa/_w640/esp_040663_1415.jpg?debug=1'
+curl -Isk 'http://localhost/@nasa/_w640/40368_PIA22228.jpg?debug=1'
 
 HTTP/1.1 200 OK
 Server: nginx
 Content-Type: image/webp
-X-Debug: /unsafe/size:640:0:0:0/preset:logo/plain/https://www.nasa.gov/sites/default/files/thumbnails/image/esp_040663_1415.jpg@webp
+X-Debug: /unsafe/size:640:0:0:0/preset:logo/plain/https://mars.nasa.gov/system/downloadable_items/40368_PIA22228.jpg@webp
 ```
 
 
@@ -282,7 +315,7 @@ Then run the command in the [Start the server](#start-the-server) section to res
 
 ### Advanced settings
 
-All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L234) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
+All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L250) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
 
 I keep all configurations in very simple variables. You can also make your own version from this base.
 
@@ -317,7 +350,7 @@ I keep all configurations in very simple variables. You can also make your own v
 >     #> E.g.
 >     ~^/@mybucket/   's3://my-bucket';
 >     ~^/@myhost/     'http://myhost.com';
->     ~^/@nasa/       'https://www.nasa.gov/sites/default/files/thumbnails/image';
+>     ~^/@nasa/       'https://mars.nasa.gov/system/downloadable_items';
 >     ~^/@pinterest/  'https://i.pinimg.com/originals';
 > }
 > ```
@@ -368,7 +401,7 @@ I keep all configurations in very simple variables. You can also make your own v
 
 > **`$imgproxy_preset`**<br/>
 > Define `imgproxy` options for each preset name.
-> You can view more details by following [their documentation](https://docs.imgproxy.net/generating_the_url?id=processing-options).
+> You can view more details by following [their documentation](https://docs.imgproxy.net/usage/processing?#processing-options).
 > ```nginx
 > map $preset_name $imgproxy_preset
 > {
@@ -407,6 +440,25 @@ I keep all configurations in very simple variables. You can also make your own v
 > ```
 
 
+> **`$imgproxy_quality` (overriding photo quality with query string)**<br/>
+> Control photo quality with query string. You can also add your custom settings.
+> ```nginx
+> map $arg_quality $imgproxy_quality
+> {
+>     default '';
+>
+>     # if the given value is between 1 and 100, override the quality
+>     ~^(?<quality>[1-9][0-9]?|100)$ '/q:${quality}';
+>
+>     # or receive some readable quality values
+>     low         '/q:30';
+>     clear       '/q:50';
+>     high        '/q:80';
+>     highest     '/q:100';
+> }
+> ```
+
+
 > **`$imgproxy_extension`**<br/>
 > Detect WebP or AVIF supports from the request header `Accept`.
 > ```nginx
@@ -420,12 +472,12 @@ I keep all configurations in very simple variables. You can also make your own v
 
 
 > **`$imgproxy_options`**<br/>
-> Generate final URL for `imgproxy` following [their documentation](https://docs.imgproxy.net/generating_the_url).
+> Generate final URL for `imgproxy` following [their documentation](https://docs.imgproxy.net/usage/processing).
 > When URL query `?skip=1` is set, use another rule to skip `imgproxy` processing.
 > ```nginx
 > map $arg_skip $imgproxy_options
 > {
->     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
+>     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}${imgproxy_quality}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
 >     ~.+     '/unsafe/plain/${origin_server}${origin_uri}';
 > }
 > ```

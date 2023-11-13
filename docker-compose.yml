@@ -5,7 +5,7 @@ version: '3'
 # A production grade image processing server setup powered by imgproxy and nginx
 #
 # Author: Mai Nhut Tan <shin@shin.company>
-# Copyright: 2021 AppSeeds https://code.shin.company/
+# Copyright: 2021-2023 SHIN Company https://code.shin.company/
 # URL: https://shinsenter.github.io/docker-imgproxy/
 ################################################################################
 
@@ -53,7 +53,7 @@ services:
       test: ["CMD", "imgproxy", "health"]
     environment:
       ### See:
-      ### https://docs.imgproxy.net/configuration
+      ### https://docs.imgproxy.net/configuration/options
 
       ### log and debug
       IMGPROXY_LOG_LEVEL: "warn"
@@ -66,7 +66,8 @@ services:
       IMGPROXY_WRITE_TIMEOUT: 10
       IMGPROXY_DOWNLOAD_TIMEOUT: 10
       IMGPROXY_KEEP_ALIVE_TIMEOUT: 300
-      IMGPROXY_MAX_SRC_FILE_SIZE: 20971520 # 20MB
+      IMGPROXY_MAX_SRC_FILE_SIZE: 33554432 # 32MB
+      IMGPROXY_MAX_SRC_RESOLUTION: 48
 
       ### image source
       IMGPROXY_TTL: 2592000 # client-side cache time is 30 days
@@ -78,7 +79,7 @@ services:
 
       ### presets
       IMGPROXY_AUTO_ROTATE: "true"
-      IMGPROXY_WATERMARK_PATH: /home/watermark.jpg
+      IMGPROXY_WATERMARK_PATH: /home/noimage_thumb.jpg
       IMGPROXY_PRESETS: default=resizing_type:fit/gravity:sm,logo=watermark:0.5:soea:10:10:0.15,center_logo=watermark:0.3:ce:0:0:0.3
 
       ### compression
@@ -99,7 +100,7 @@ services:
       # IMGPROXY_SIGNATURE_SIZE: 32
 
       ### External source (S3)
-      ### See: https://docs.imgproxy.net/serving_files_from_s3
+      ### See: https://docs.imgproxy.net/image_sources/amazon_s3
       # IMGPROXY_USE_S3: "true"
       # IMGPROXY_S3_REGION: "us-west-1"
       # IMGPROXY_S3_ENDPOINT: "<your endpoint>"
@@ -107,12 +108,12 @@ services:
       # AWS_SECRET_ACCESS_KEY: "<your key>"
 
       ### External source (Google Cloud)
-      ### See: https://docs.imgproxy.net/serving_files_from_google_cloud_storage
+      ### See: https://docs.imgproxy.net/image_sources/google_cloud_storage
       # IMGPROXY_USE_GCS: "true"
       # IMGPROXY_GCS_KEY: "<your key>"
 
       ### External source (Azure Blob)
-      ### See: https://docs.imgproxy.net/serving_files_from_azure_blob_storage
+      ### See: https://docs.imgproxy.net/image_sources/azure_blob_storage
       # IMGPROXY_USE_ABS: "true"
       # IMGPROXY_ABS_NAME: "<your name>"
       # IMGPROXY_ABS_KEY: "<your key>"
