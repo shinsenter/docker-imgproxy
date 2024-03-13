@@ -16,16 +16,12 @@
 ![docker-imgproxy](www/project.jpg)
 
 - **Author**: Mai Nhut Tan <shin@shin.company>
-- **Copyright**: 2021-2023 SHIN Company <https://code.shin.company/docker-imgproxy#readme>
+- **Copyright**: 2021-2024 SHIN Company <https://code.shin.company/docker-imgproxy#readme>
 
 
 ## Support my activities
 
-If you like this repository, please hit the star button to follow further updates, or buy me a coffee 😉.
-
-[![Donate via PayPal](https://img.shields.io/badge/Donate-Paypal-blue)](https://www.paypal.me/shinsenter) [![Become a sponsor](https://img.shields.io/badge/Donate-Patreon-orange)](https://www.patreon.com/appseeds) [![Become a stargazer](https://img.shields.io/badge/Support-Stargazer-yellow)](https://github.com/shinsenter/docker-imgproxy/stargazers) [![Report an issue](https://img.shields.io/badge/Support-Issues-green)](https://github.com/shinsenter/docker-imgproxy/discussions/new)
-
-I really appreciate your love and supports.
+If you find this project useful, consider donating via [PayPal](https://www.paypal.me/shinsenter) or open an issue on [Github](https://github.com/shinsenter/docker-imgproxy/discussions/new/choose). Your support helps keep this project maintained and improved for the community.
 
 
 ---
@@ -33,36 +29,61 @@ I really appreciate your love and supports.
 
 ## Why it's good
 
-- Just download this project and run <sup>`(*)`</sup>.
-- Fast on-the-fly generating thumbnails thanks to `imgproxy`.
-- High availability and performance thanks to Nginx content caching.
-- Forget troubles of [Image URL signature](https://docs.imgproxy.net/configuration?id=url-signature), but still ensure the security of the service.
-- Easily serve local files as well as from other origin servers.
-- Flexible in customizing SEO-friendly URLs without exposing `imgproxy` options (which are long and hard to remember).
-- Flexible in selecting origin server for the request <sup>`(**)`</sup>.
-- Flexible in creating your own image presets for any request.
-- Flexible in serving fallback image when the source file is not available.
-- Easy SSL configuration (with your own certificates) with built-in HTTP/2 support.
-- Automatically detect and convert images to WebP or AVIF format if the browser supports.
+Experience the ultimate in efficient image delivery with our cutting-edge solution:
 
-<sup>`(*)` using Docker Compose.</sup>
-<sup>`(**)` which is [supported by imgproxy](#supported-origin-servers).</sup>
+- Lightning-fast on-the-fly thumbnail generation powered by [`imgproxy`](https://imgproxy.net).
+- High availability and unparalleled performance thanks to Nginx content caching.
+- Bid farewell to [URL signature](https://docs.imgproxy.net/usage/signing_url#configuring-url-signature) management hassles while maintaining top-notch security.
+- Effortless serving of local files or remote server content.
+- SEO-friendly URL crafting without exposing [complex `imgproxy` options](https://docs.imgproxy.net/usage/processing).
+- Unmatched flexibility:
+  - Customize image presets for any request.
+  - Dynamic origin server selection.
+  - Graceful fallback image handling for unavailable sources.
+- Hassle-free SSL configuration with built-in HTTP/2 support for blazing-fast load times.
+- Intelligent image format conversion to WebP (or AVIF) for browser compatibility.
+- Seamless visual experience across devices.
+
+Unleash the power of our cutting-edge solution and take your project to new heights with efficient image delivery.
 
 ---
 
 
 ## Getting started
 
+### Pull this project from Github
+
+Please run the below command to download the project to your local machine:
+
+```shell
+git clone https://github.com/shinsenter/docker-imgproxy.git docker-imgproxy
+```
+
+Or:
+
+```shell
+curl -skL https://github.com/shinsenter/docker-imgproxy/archive/refs/heads/main.zip -o docker-imgproxy.zip && unzip docker-imgproxy.zip
+rm -f docker-imgproxy.zip
+mv docker-imgproxy-main docker-imgproxy
+```
+
 ### Prepare your files
 
-Please put your files to be served in the folder `www/`.
+Change your working directory to downloaded directory in the above step.
+
+```shell
+cd docker-imgproxy
+```
+
+Then put your image files to be served to the folder `www/`.
 
 There are some sample files available (a sample image `cacti.jpg`, a watermark, and some fallback images).
 
 
 ### Start the server
 
-```bash
+```shell
+cd docker-imgproxy
 docker-compose up -d --build --remove-orphans --force-recreate
 ```
 
@@ -111,6 +132,14 @@ I already created some preset names, such as `_thumb` or `_w200`, and I add pres
 > http://localhost/_square/cacti.jpg
 
 
+> The image with preset `_masked` applied.<br/>
+> http://localhost/_masked/cacti.jpg
+
+
+> Or just to download the image (with filters applied).<br/>
+> http://localhost/_download/cacti.jpg
+
+
 See [my configurations](#advanced-settings) to know how it works.
 
 
@@ -146,6 +175,14 @@ With the same presets as above examples, we are going to serve an image [by NASA
 
 > The image with preset `_square` applied.<br/>
 > http://localhost/@nasa/_square/40368_PIA22228.jpg
+
+
+> The image with preset `_masked` applied.<br/>
+> http://localhost/@nasa/_masked/40368_PIA22228.jpg
+
+
+> Or just to download the image (with filters applied).<br/>
+> http://localhost/@nasa/_download/40368_PIA22228.jpg
 
 
 #### Supported origin servers
@@ -225,7 +262,7 @@ curl -Isk 'http://localhost/_small/cacti.jpg?debug=1'
 HTTP/1.1 200 OK
 Server: nginx
 Content-Type: image/webp
-X-Debug: /unsafe/size:320:320:0:0/sharpen:0.3/preset:logo/plain/local:///cacti.jpg@webp
+X-Debug: /unsafe/size:320:320:0:0/sharpen:0.3/preset:logo/dpr:1/plain/local:///cacti.jpg
 ```
 
 Example 2 (remote file with preset `_w640`):
@@ -235,7 +272,7 @@ curl -Isk 'http://localhost/@nasa/_w640/40368_PIA22228.jpg?debug=1'
 HTTP/1.1 200 OK
 Server: nginx
 Content-Type: image/webp
-X-Debug: /unsafe/size:640:0:0:0/preset:logo/plain/https://mars.nasa.gov/system/downloadable_items/40368_PIA22228.jpg@webp
+X-Debug: /unsafe/size:640:0:0:0/preset:logo/dpr:1/plain/https://mars.nasa.gov/system/downloadable_items/40368_PIA22228.jpg
 ```
 
 
@@ -260,15 +297,18 @@ We can use these URL query components to modify some requests.
 
 > `skip=1`<br/>
 > Skip imgproxy processing for current request. The original file will be served.<br/>
-> E.g. http://localhost/cacti.jpg?skip=1
+> E.g. http://localhost/_small/cacti.jpg?skip=1 <br/>
+> E.g. http://localhost/@nasa/_small/40368_PIA22228.jpg?skip=1
 
 > `nocache=1`<br/>
 > Disable Nginx caching for current request. The response will not be saved to a cache.<br/>
-> E.g. http://localhost/cacti.jpg?nocache=1
+> E.g. http://localhost/cacti.jpg?nocache=1 <br/>
+> E.g. http://localhost/@nasa/40368_PIA22228.jpg?nocache=1
 
 > `bypass=1`<br/>
 > By pass Nginx caching for current request. The response will not be taken from a cache.<br/>
-> E.g. http://localhost/cacti.jpg?bypass=1
+> E.g. http://localhost/_small/cacti.jpg?bypass=1 <br/>
+> E.g. http://localhost/@nasa/_small/40368_PIA22228.jpg?bypass=1
 
 If you like this setup, please [support my works](#support-my-activities) 😉.
 
@@ -297,16 +337,16 @@ Then run the command in the [Start the server](#start-the-server) section to rec
 
 ### Serving files from private storage
 
-Please uncomment settings in `docker-compose.yml` file to enable serving files from [Amazon S3 buckets](docker-compose.yml#L101~L107), [Google Cloud](docker-compose.yml#L109~L112) or [Azure Blob](docker-compose.yml#L114~L119). Then run the command in the [Start the server](#start-the-server) section to recreate and restart the service.
+Please uncomment settings in `docker-compose.yml` file to enable serving files from [Amazon S3 buckets](docker-compose.yml#L179~L184), [Google Cloud](docker-compose.yml#L186~L189) or [Azure Blob](docker-compose.yml#L191~L196), etc. Then run the command in the [Start the server](#start-the-server) section to recreate and restart the service.
 
-You can find more details on [imgproxy documentation](https://docs.imgproxy.net/configuration?id=serving-files-from-amazon-s3).
+You can find more details on [imgproxy documentation](https://docs.imgproxy.net/configuration/options?#image-sources).
 
 
 ### Flushing cache files
 
 Just remove the folder `cache/`.
 
-```bash
+```shell
 rm -rf cache/
 ```
 
@@ -315,7 +355,7 @@ Then run the command in the [Start the server](#start-the-server) section to res
 
 ### Advanced settings
 
-All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L250) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
+All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L270) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
 
 I keep all configurations in very simple variables. You can also make your own version from this base.
 
@@ -405,17 +445,19 @@ I keep all configurations in very simple variables. You can also make your own v
 > ```nginx
 > map $preset_name $imgproxy_preset
 > {
->     default 'size:1600:0:0:0/preset:logo';
+>     default 'size:1600:0:0:0/preset:logo'; # preset:logo adds watermark to the image
 >
 >     # Dynamic preset
 >     ~^max_w:(?<width>[0-9]+)$ 'size:${width}:0:0:0/preset:logo';
 >
 >     # Static presets
->     blurry  'size:320:320:1:0/blur:10/quality:50';
->     small   'size:320:320:0:0/sharpen:0.3/preset:logo';
->     medium  'size:640:640:0:0/preset:logo';
->     thumb   'size:160:160:1:1/bg:ffffff/resizing_type:fill/sharpen:0.3';
->     square  'size:500:500:0:1/bg:ffffff/resizing_type:fill/preset:center_logo';
+>     blurry   'size:320:320:1:0/blur:10/quality:50';
+>     small    'size:320:320:0:0/sharpen:0.3/preset:logo';
+>     medium   'size:640:640:0:0/preset:logo';
+>     thumb    'size:160:160:1:1/bg:ffffff/resizing_type:fill/sharpen:0.3';
+>     square   'size:500:500:0:1/bg:ffffff/resizing_type:fill/preset:logo';
+>     masked   'size:500:0:0:1/bg:ffffff/resizing_type:fill/preset:repeated_logo';
+>     download 'size:1600:0:0:0/preset:logo/return_attachment:1';
 > }
 > ```
 
@@ -459,14 +501,34 @@ I keep all configurations in very simple variables. You can also make your own v
 > ```
 
 
+> **`$imgproxy_dpr` (controlling photo dimensions, aka Device Pixel Ratio)**<br/>
+> This will multiplying the image dimensions according to this factor for HiDPI (Retina) devices.
+> ```nginx
+> map $http_user_agent@$http_dpr $imgproxy_dpr
+> {
+>     default '/dpr:1';
+>
+>     # parse from DPR header
+>     ~@(?<dpr>[1-4])     '/dpr:${dpr}';
+>
+>     # Put your rewrite rules for DPR settings from here.
+>     #> E.g. these lines will set custom DPR for smartphones.
+>     # ~iPhone|iPad|Mac    '/dpr:3';
+>     # ~Android            '/dpr:2';
+> }
+> ```
+
+
 > **`$imgproxy_extension`**<br/>
 > Detect WebP or AVIF supports from the request header `Accept`.
 > ```nginx
 > map $http_accept $imgproxy_extension
 > {
 >     default '';
->     ~*webp  '@webp';
->     ~*avif  '@avif';
+>
+>     # uncomment this lines to enable WebP or AVIF compression
+>     # ~*webp  '@webp';
+>     # ~*avif  '@avif';
 > }
 > ```
 
@@ -477,7 +539,7 @@ I keep all configurations in very simple variables. You can also make your own v
 > ```nginx
 > map $arg_skip $imgproxy_options
 > {
->     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}${imgproxy_quality}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
+>     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}${imgproxy_quality}${imgproxy_dpr}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
 >     ~.+     '/unsafe/plain/${origin_server}${origin_uri}';
 > }
 > ```

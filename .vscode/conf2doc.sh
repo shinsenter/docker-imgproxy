@@ -2,7 +2,7 @@
 
 BASE=$(dirname $0)
 README=$BASE/../README.md
-# PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
 
 USAGE="$(
     grep -aPzo --color=never \
