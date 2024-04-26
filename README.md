@@ -19,6 +19,13 @@
 - **Copyright**: 2021-2024 SHIN Company <https://code.shin.company/docker-imgproxy#readme>
 
 
+## Disclaimer
+
+This project provides a solid foundation for building a custom image processing server. While it's designed for general use, you might need to tweak it further to perfectly match your specific needs.
+
+I poured my heart into this project, hoping it serves as a valuable learning resource for anyone interested in exploring image processing configurations. If it doesn't fully address your current requirements, don't hesitate to keep searching for the perfect solution!
+
+
 ## Support my activities
 
 If you find this project useful, consider donating via [PayPal](https://www.paypal.me/shinsenter) or open an issue on [Github](https://github.com/shinsenter/docker-imgproxy/discussions/new/choose). Your support helps keep this project maintained and improved for the community.
