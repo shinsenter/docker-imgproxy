@@ -370,7 +370,7 @@ I keep all configurations in very simple variables. You can also make your own v
 > **`$use_imgproxy`**<br/>
 > This flag indicates that the request will be proceeded by `imgproxy`.
 > ```nginx
-> map $uri $use_imgproxy
+> map $file_uri $use_imgproxy
 > {
 >     default 0;
 >
@@ -522,20 +522,6 @@ I keep all configurations in very simple variables. You can also make your own v
 >     #> E.g. these lines will set custom DPR for smartphones.
 >     # ~iPhone|iPad|Mac    '/dpr:3';
 >     # ~Android            '/dpr:2';
-> }
-> ```
-
-
-> **`$imgproxy_extension`**<br/>
-> Detect WebP or AVIF supports from the request header `Accept`.
-> ```nginx
-> map $http_accept $imgproxy_extension
-> {
->     default '';
->
->     # uncomment this lines to enable WebP or AVIF compression
->     # ~*webp  '@webp';
->     # ~*avif  '@avif';
 > }
 > ```
 
