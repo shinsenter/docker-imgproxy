@@ -199,6 +199,50 @@ This setup serve images from other public origin servers, as well as from Amazon
 You can learn how to serve files from private storage in the [configurations section](#serving-files-from-private-storage).
 
 
+#### Base64 encoded URLs
+
+The source URL can be encrypted with URL-safe Base64, prepended by the `/@base64/` prefix. So you can access the remote images like the below:
+
+<small>Note: the image source is from NASA, it may be unavailable in the future.</small>
+
+<p style="color:red">⚠️ Warning: Since this project has simplified the "URL signature" function of imgproxy, please be cautious with the use of Base64-encoded URLs. Malicious actors could exploit this to process images from any untrusted sources for unethical purposes.</p>
+
+> Image with no preset (it is resized to max-width=1600 as default).<br/>
+> http://localhost/@base64/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_w200` applied (`200` is a dynamic number).<br/>
+> http://localhost/@base64/_w200/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_blurry` applied.<br/>
+> http://localhost/@base64/_blurry/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_small` applied.<br/>
+> http://localhost/@base64/_small/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_medium` applied.<br/>
+> http://localhost/@base64/_medium/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_thumb` applied.<br/>
+> http://localhost/@base64/_thumb/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_square` applied.<br/>
+> http://localhost/@base64/_square/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> The image with preset `_masked` applied.<br/>
+> http://localhost/@base64/_masked/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
+> Or just to download the image (with filters applied).<br/>
+> http://localhost/@base64/_download/aHR0cHM6Ly9tYXJzLm5hc2EuZ292L3N5c3RlbS9kb3dubG9hZGFibGVfaXRlbXMvNDAzNjglNUZQSUEyMjIyOC5qcGc=
+
+
 ### Customize resizing via query string
 
 #### Image width and height
@@ -329,7 +373,7 @@ If you like this setup, please [support my works](#support-my-activities) 😉.
 
 Create a folder `certs/` in the same place with the `docker-compose.yml` file, then rename and put your SSL certificates `server.crt` and `server.key` to that `certs/` folder.
 
-Open the file at [`nginx/nginx.conf`](nginx/nginx.conf#L113~L116) and uncomment 4 lines right after the `# SSL` line, like this:
+Open the file at [`nginx/nginx.conf`](nginx/nginx.conf#L120~L124) and uncomment 4 lines right after the `# SSL` line, like this:
 
 ```nginx
 # SSL
@@ -344,7 +388,7 @@ Then run the command in the [Start the server](#start-the-server) section to rec
 
 ### Serving files from private storage
 
-Please uncomment settings in `docker-compose.yml` file to enable serving files from [Amazon S3 buckets](docker-compose.yml#L179~L184), [Google Cloud](docker-compose.yml#L186~L189) or [Azure Blob](docker-compose.yml#L191~L196), etc. Then run the command in the [Start the server](#start-the-server) section to recreate and restart the service.
+Please uncomment settings in `docker-compose.yml` file to enable serving files from [Amazon S3 buckets](docker-compose.yml#L177~L182), [Google Cloud](docker-compose.yml#L184~L187) or [Azure Blob](docker-compose.yml#L189~L194), etc. Then run the command in the [Start the server](#start-the-server) section to recreate and restart the service.
 
 You can find more details on [imgproxy documentation](https://docs.imgproxy.net/configuration/options?#image-sources).
 
@@ -362,7 +406,7 @@ Then run the command in the [Start the server](#start-the-server) section to res
 
 ### Advanced settings
 
-All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L270) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
+All settings for handling image URLs are written in the [`imgproxy.conf`](imgproxy.conf#L70~L295) file using [Nginx's map directives](https://Nginx.org/en/docs/http/ngx_http_map_module.html#directives).
 
 I keep all configurations in very simple variables. You can also make your own version from this base.
 
@@ -370,13 +414,21 @@ I keep all configurations in very simple variables. You can also make your own v
 > **`$use_imgproxy`**<br/>
 > This flag indicates that the request will be proceeded by `imgproxy`.
 > ```nginx
-> map $file_uri $use_imgproxy
+> map $uri_omitted_origin_preset $use_imgproxy
 > {
 >     default 0;
 >
 >     # Add any rules that you want to skip image processing.
 >     #> E.g. this line excludes files under "hq-cactus" folder.
 >     ~^/hq-cactus/ 0;
+>
+>     # File URL is base64-encoded
+>     #> Warning: Since this project has simplified the "URL signature" function of imgproxy,
+>     #> please be cautious with the use of Base64-encoded URLs.
+>     #> Malicious actors could exploit this to process images from any untrusted sources for unethical purposes.
+>     #> Comment out these two lines to disable Base64-encoded URLs.
+>     ~^/@base64/         1;
+>     ~[-A-Za-z0-9+/]*=*$ 1;
 >
 >     # Else, process all image files with these file extensions
 >     ~*\.(jpe?g|png|gif|tiff?|bmp)$  1;
@@ -399,6 +451,14 @@ I keep all configurations in very simple variables. You can also make your own v
 >     ~^/@myhost/     'http://myhost.com';
 >     ~^/@nasa/       'https://mars.nasa.gov/system/downloadable_items';
 >     ~^/@pinterest/  'https://i.pinimg.com/originals';
+>
+>     # Source URL can be encoded with URL-safe Base64 (please be cautious!)
+>     #> See: https://docs.imgproxy.net/usage/processing#source-url
+>     #> Warning: Since this project has simplified the "URL signature" function of imgproxy,
+>     #> please be cautious with the use of Base64-encoded URLs.
+>     #> Malicious actors could exploit this to process images from any untrusted sources for unethical purposes.
+>     #> Comment out the below line to disable Base64-encoded URLs.
+>     ~^/@base64/     ''; # no origin server
 > }
 > ```
 
@@ -532,8 +592,8 @@ I keep all configurations in very simple variables. You can also make your own v
 > ```nginx
 > map $arg_skip $imgproxy_options
 > {
->     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}${imgproxy_quality}${imgproxy_dpr}/plain/${origin_server}${origin_uri}${imgproxy_extension}';
->     ~.+     '/unsafe/plain/${origin_server}${origin_uri}';
+>     default '/unsafe/${imgproxy_preset}${imgproxy_preset_query}${imgproxy_quality}${imgproxy_dpr}${imgproxy_type}/${origin_server}${origin_uri}${imgproxy_extension}';
+>     ~.+     '/unsafe${imgproxy_type}/${origin_server}${origin_uri}';
 > }
 > ```
 
