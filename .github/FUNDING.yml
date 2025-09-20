@@ -1,4 +1,2 @@
-# These are supported funding model platforms
-
-github: shinsenter
-custom: ['https://www.paypal.me/shinsenter']
+github: [shinsenter]
+custom: [https://www.paypal.me/shinsenter]
